@@ -1,0 +1,37 @@
+{
+  "name": "parse-git-numstat",
+  "version": "1.0.0",
+  "description": "Parses git logs created with numstat option",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test",
+    "coverage": "nyc npm run test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codevey/parse-git-numstat.git"
+  },
+  "keywords": [
+    "git",
+    "log",
+    "numstat",
+    "parse"
+  ],
+  "author": "Christoph Walcher <christoph.walcher@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codevey/parse-git-numstat/issues"
+  },
+  "homepage": "https://github.com/codevey/parse-git-numstat#readme",
+  "dependencies": {
+    "dayjs": "^1.8.15"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^6.1.0",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1"
+  }
+}
