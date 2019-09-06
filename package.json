@@ -26,11 +26,11 @@
   },
   "homepage": "https://github.com/codevey/parse-git-numstat#readme",
   "dependencies": {
-    "dayjs": "^1.8.15"
+    "dayjs": "^1.8.16"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^6.1.0",
+    "eslint": "^6.3.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1"
   }
