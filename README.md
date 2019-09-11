@@ -12,7 +12,7 @@ npm i parse-git-numstat
     const fs = require('fs');
     const parse = require('parse-git-numstat');
 
-    const gitlog = fs.readfileSync('location/to/gitlog.txt', { encoding: 'utf-8' });
+    const gitlog = fs.readFileSync('location/to/gitlog.txt', { encoding: 'utf-8' });
     const commits = parse(gitlog);
 
     console.log(commits[0]);
