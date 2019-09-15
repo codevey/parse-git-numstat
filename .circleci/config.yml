@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/node:10
+    working_directory: ~/repo
     steps:
       - checkout
       - run:
@@ -24,10 +25,10 @@ jobs:
           name: coverage
           command: 'npm run coverage -- --reporter=text-lcov'
       - store_artifacts:
-          path: test-results.xml
+          path: ./reports/mocha/test-results.xml
           prefix: tests
       - store_artifacts:
           path: coverage
           prefix: coverage
       - store_test_results:
-          path: test-results.xml
+          path: reports

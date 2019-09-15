@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha test --recursive",
-    "test:ci": "mocha test --recursive --reporter mocha-junit-reporter",
+    "test:ci": "mocha test --recursive --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
     "coverage": "nyc npm run test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

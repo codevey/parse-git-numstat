@@ -5,4 +5,4 @@ coverage/
 *.*~
 *.tgz
 .vscode/
-test-results.xml
+reports/
