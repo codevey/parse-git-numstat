@@ -1,7 +1,9 @@
 const matchGroups = require('./lib/match-groups');
+const parseRename = require('./lib/parse-rename');
+
 const dayjs = require('dayjs');
 
-module.exports = function (log) {
+module.exports = function(log) {
   const parsedLog = [];
 
   const lines = log.split(/\r?\n/g);
@@ -36,7 +38,7 @@ module.exports = function (log) {
     const message = cursor
       .nextWhile(line => line.length > 0)
       .map(line => line.trim())
-      .reduce((accumulator, current, idx) => idx === 0 ? current : accumulator + '\n' + current, '');
+      .reduce((accumulator, current, idx) => (idx === 0 ? current : accumulator + '\n' + current), '');
 
     const stat = parseStat(cursor);
 
@@ -49,14 +51,14 @@ module.exports = function (log) {
       merge,
       date,
       message,
-      stat
+      stat,
     });
   }
 
   return parsedLog;
 };
 
-function parseStat (cursor) {
+function parseStat(cursor) {
   if (!cursor.hasNext() || cursor.peek().indexOf('commit ') === 0) {
     return [];
   }
@@ -64,40 +66,31 @@ function parseStat (cursor) {
   return cursor
     .nextWhile(line => line.length > 0)
     .map(line => matchGroups(/(?<added>\d+|-)\s+(?<deleted>\d+|-)\s+(?<filepath>.+)/, line))
-    .map(stat => {
-      const renames = matchGroups(/(?<prefix>.*)\{(?<from>.+)\s=>\s(?<to>.+)\}(?<postfix>.*)/, stat.filepath);
-
-      if (!renames) {
-        return stat;
-      }
-
-      return Object.assign({}, stat, {
-        filepath: `${renames.prefix}${renames.to}${renames.postfix}`,
-        renames: `${renames.prefix}${renames.from}${renames.postfix}`
-      });
-    })
-    .map(stat => Object.assign({}, stat, {
-      added: stat.added === '-' ? null : parseInt(stat.added, 10),
-      deleted: stat.deleted === '-' ? null : parseInt(stat.deleted, 10)
-    }));
+    .map(stat => Object.assign({}, stat, parseRename(stat.filepath)))
+    .map(stat =>
+      Object.assign({}, stat, {
+        added: stat.added === '-' ? null : parseInt(stat.added, 10),
+        deleted: stat.deleted === '-' ? null : parseInt(stat.deleted, 10),
+      }),
+    );
 }
 
 class Cursor {
-  constructor (lines) {
+  constructor(lines) {
     this.lines = lines;
     this.idx = -1;
   }
 
-  hasNext () {
-    return (this.idx + 1) < this.lines.length;
+  hasNext() {
+    return this.idx + 1 < this.lines.length;
   }
 
-  next () {
+  next() {
     this.idx++;
     return this.current();
   }
 
-  nextWhile (condition) {
+  nextWhile(condition) {
     const lines = [];
 
     while (condition(this.next())) {
@@ -107,15 +100,15 @@ class Cursor {
     return lines;
   }
 
-  current () {
+  current() {
     return this.lines[this.idx];
   }
 
-  peek () {
+  peek() {
     return this.lines[this.idx + 1];
   }
 
-  index () {
+  index() {
     return this.idx;
   }
 }
