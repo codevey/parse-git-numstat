@@ -10,7 +10,7 @@ describe('parse-git-numstat', () => {
     const parsedLogEntry = parsedLogEntries[0];
     expect(parsedLogEntry.sha).to.equal('c8ebaf0b5af9db85b7694f07261ef2d0a651c27c');
     expect(parsedLogEntry.author).to.deep.equal({ name: 'saintedlama', email: 'christoph.walcher@gmail.com' });
-    expect(parsedLogEntry.date).to.deep.equal(new Date(2019, 5, 1, 17, 49, 20));
+    expect(parsedLogEntry.date).to.deep.equal(new Date(Date.UTC(2019, 5, 1, 15, 49, 20)));
 
     expect(parsedLogEntry.message).to.equal('chore: initial commit');
     expect(parsedLogEntry.stat).to.have.length(10);
@@ -38,25 +38,25 @@ describe('parse-git-numstat', () => {
     expect(parsedLogEntry.stat[0]).to.deep.equal({
       filepath: 'NHibernate/Iesi.Collections.dll',
       added: null,
-      deleted: null
+      deleted: null,
     });
 
     expect(parsedLogEntry.stat[1]).to.deep.equal({
       filepath: 'NHibernate/LinFu.DynamicProxy.dll',
       added: null,
-      deleted: null
+      deleted: null,
     });
 
     expect(parsedLogEntry.stat[2]).to.deep.equal({
       filepath: 'NHibernate/NHibernate.ByteCode.LinFu.dll',
       added: null,
-      deleted: null
+      deleted: null,
     });
 
     expect(parsedLogEntry.stat[3]).to.deep.equal({
       filepath: 'NHibernate/NHibernate.dll',
       added: null,
-      deleted: null
+      deleted: null,
     });
   });
 
@@ -77,6 +77,30 @@ Due to the way VS test works (by injecting an executable entry point)...`);
 
     expect(parsedLogEntry.stat[0].filepath).to.equal('Dapper.Tests.Performance/EntityFramework/EFContext.cs');
     expect(parsedLogEntry.stat[0].renames).to.equal('Dapper.Tests/EntityFramework/EFContext.cs');
+  });
+
+  it('should parse log entry stat with complex rename', () => {
+    const parsedLogEntries = parseLog(commitWithComplexRenameLinestat);
+
+    expect(parsedLogEntries).to.have.length(1);
+    const parsedLogEntry = parsedLogEntries[0];
+
+    expect(parsedLogEntry.stat[0].filepath).to.equal(
+      'src/Tasks/Microsoft.NET.Build.Extensions.Tasks/Microsoft.NET.Build.Extensions.Tasks.csproj',
+    );
+    expect(parsedLogEntry.stat[0].renames).to.be.undefined;
+
+    expect(parsedLogEntry.stat[1].filepath).to.equal(
+      'src/Tasks/Microsoft.NET.Build.Extensions.Tasks/msbuildExtensions-ver/Microsoft.Common.targets/ImportAfter/Microsoft.NET.Build.Extensions.targets',
+    );
+    expect(parsedLogEntry.stat[1].renames).to.be.undefined;
+
+    expect(parsedLogEntry.stat[2].filepath).to.equal(
+      'src/Tasks/Microsoft.NET.Build.Extensions.Tasks/msbuildExtensions/Microsoft/Microsoft.NET.Build.Extensions/Microsoft.NET.Build.Extensions.ConflictResolution.targets',
+    );
+    expect(parsedLogEntry.stat[2].renames).to.equal(
+      'src/Tasks/Microsoft.NET.Build.Extensions.Tasks/msbuildExtensions/Microsoft.NET.Build.Extensions/Microsoft.NET.Build.Extensions.ConflictResolution.targets',
+    );
   });
 });
 
@@ -173,5 +197,20 @@ Date:   Sat Mar 25 19:34:10 2017 -0400
     VS 2017 .csproj Migration
 
 6	5	{Dapper.Tests => Dapper.Tests.Performance}/EntityFramework/EFContext.cs
+
+`;
+
+const commitWithComplexRenameLinestat = `commit b9648939ce3916d33862de367609c729e9278bf1
+Author: Daniel Plaisted <daplaist@microsoft.com>
+Date:   Fri Jun 9 16:58:51 2017 -0700
+
+    Move Microsoft.NET.Build.Extensions into Microsoft subfolder
+
+2	2	src/Tasks/Microsoft.NET.Build.Extensions.Tasks/Microsoft.NET.Build.Extensions.Tasks.csproj
+1	1	src/Tasks/Microsoft.NET.Build.Extensions.Tasks/msbuildExtensions-ver/Microsoft.Common.targets/ImportAfter/Microsoft.NET.Build.Extensions.targets
+0	0	src/Tasks/Microsoft.NET.Build.Extensions.Tasks/msbuildExtensions/{ => Microsoft}/Microsoft.NET.Build.Extensions/Microsoft.NET.Build.Extensions.ConflictResolution.targets
+0	0	src/Tasks/Microsoft.NET.Build.Extensions.Tasks/msbuildExtensions/{ => Microsoft}/Microsoft.NET.Build.Extensions/Microsoft.NET.Build.Extensions.NETFramework.targets
+0	0	src/Tasks/Microsoft.NET.Build.Extensions.Tasks/msbuildExtensions/{ => Microsoft}/Microsoft.NET.Build.Extensions/Microsoft.NET.Build.Extensions.targets
+1	1	test/Microsoft.NET.TestFramework/RepoInfo.cs
 
 `;
