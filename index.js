@@ -64,12 +64,18 @@ function parseStat(cursor) {
     .nextWhile(line => line.length > 0)
     .map(line => matchGroups(/(?<added>\d+|-)\s+(?<deleted>\d+|-)\s+(?<filepath>.+)/, line))
     .map(stat => Object.assign({}, stat, parseRename(stat.filepath)))
-    .map(stat =>
-      Object.assign({}, stat, {
-        added: stat.added === '-' ? null : parseInt(stat.added, 10),
-        deleted: stat.deleted === '-' ? null : parseInt(stat.deleted, 10),
-      }),
-    );
+    .map(parseStatLine);
+}
+
+function parseStatLine(stat) {
+  if (stat.added == '-' || stat.deleted == '-') {
+    return Object.assign({}, stat, { added: null, deleted: null, binary: true });
+  }
+
+  return Object.assign({}, stat, {
+    added: parseInt(stat.added, 10),
+    deleted: parseInt(stat.deleted, 10),
+  });
 }
 
 class Cursor {

@@ -27,7 +27,7 @@ describe('parse-git-numstat', () => {
     expect(parsedLogEntries[2].sha).to.equal('4e665307bc02af812f6b11626f685b7246e19451');
   });
 
-  it('should parse log entry with non numeric line stat', () => {
+  it('should parse log entry from binary line stat', () => {
     const parsedLogEntries = parseLog(commitWithNonNumericLinestat);
 
     expect(parsedLogEntries).to.have.length(1);
@@ -37,24 +37,28 @@ describe('parse-git-numstat', () => {
 
     expect(parsedLogEntry.stat[0]).to.deep.equal({
       filepath: 'NHibernate/Iesi.Collections.dll',
+      binary: true,
       added: null,
       deleted: null,
     });
 
     expect(parsedLogEntry.stat[1]).to.deep.equal({
       filepath: 'NHibernate/LinFu.DynamicProxy.dll',
+      binary: true,
       added: null,
       deleted: null,
     });
 
     expect(parsedLogEntry.stat[2]).to.deep.equal({
       filepath: 'NHibernate/NHibernate.ByteCode.LinFu.dll',
+      binary: true,
       added: null,
       deleted: null,
     });
 
     expect(parsedLogEntry.stat[3]).to.deep.equal({
       filepath: 'NHibernate/NHibernate.dll',
+      binary: true,
       added: null,
       deleted: null,
     });
