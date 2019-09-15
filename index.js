@@ -42,9 +42,6 @@ module.exports = function(log) {
 
     const stat = parseStat(cursor);
 
-    // skip trailing newline - already done by nextWhile
-    // cursor.next()
-
     parsedLog.push({
       sha,
       author: matchGroups(/Author:\s(?<name>.*?)\s<(?<email>.*?)>/, author),
