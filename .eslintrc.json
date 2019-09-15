@@ -6,7 +6,11 @@
     "mocha": true
   },
   "extends": [
-    "eslint:recommended"
+    "eslint:recommended",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
   ],
   "globals": {
     "Atomics": "readonly",
@@ -18,6 +22,7 @@
   "rules": {
     "semi": "error",
     "no-var": "error",
-    "prefer-const": "error"
+    "prefer-const": "error",
+    "prettier/prettier": "error"
   }
 }
