@@ -1,22 +1,27 @@
 const matchGroups = require('./lib/match-groups');
-const parseRename = require('./lib/parse-rename');
+const parseStat = require('./lib/parse-stat');
+const parseTags = require('./lib/parse-tags');
+const parseBranches = require('./lib/parse-branches');
+const Cursor = require('./lib/cursor');
 
 const dayjs = require('dayjs');
 
 module.exports = function(log) {
-  const parsedLog = [];
+  const commits = [];
 
   const lines = log.split(/\r?\n/g);
   const cursor = new Cursor(lines);
 
   while (cursor.hasNext() && cursor.peek().length > 0) {
-    const sha = matchGroups(/commit\s(?<sha>.*)/, cursor.next()).sha;
+    const { sha, decoration } = matchGroups(/commit\s(?<sha>[a-f0-9]*)(\s\((?<decoration>.*)\))?/i, cursor.next());
 
     if (!sha) {
       throw new Error(`Could not parse git log entry with no sha given at line ${cursor.index()}`);
     }
 
-    // TODO: Parse author!
+    const tags = parseTags(decoration);
+    const branches = parseBranches(decoration);
+
     let author = cursor.next();
     let merge = null;
 
@@ -42,76 +47,29 @@ module.exports = function(log) {
 
     const stat = parseStat(cursor);
 
-    parsedLog.push({
+    const commit = {
       sha,
-      author: matchGroups(/Author:\s(?<name>.*?)\s<(?<email>.*?)>/, author),
+      author: parseAuthor(author),
       merge,
       date,
       message,
       stat,
-    });
-  }
+    };
 
-  return parsedLog;
-};
-
-function parseStat(cursor) {
-  if (!cursor.hasNext() || cursor.peek().indexOf('commit ') === 0) {
-    return [];
-  }
-
-  return cursor
-    .nextWhile(line => line.length > 0)
-    .map(line => matchGroups(/(?<added>\d+|-)\s+(?<deleted>\d+|-)\s+(?<filepath>.+)/, line))
-    .map(stat => Object.assign({}, stat, parseRename(stat.filepath)))
-    .map(parseStatLine);
-}
-
-function parseStatLine(stat) {
-  if (stat.added == '-' || stat.deleted == '-') {
-    return Object.assign({}, stat, { added: null, deleted: null, binary: true });
-  }
-
-  return Object.assign({}, stat, {
-    added: parseInt(stat.added, 10),
-    deleted: parseInt(stat.deleted, 10),
-  });
-}
-
-class Cursor {
-  constructor(lines) {
-    this.lines = lines;
-    this.idx = -1;
-  }
-
-  hasNext() {
-    return this.idx + 1 < this.lines.length;
-  }
-
-  next() {
-    this.idx++;
-    return this.current();
-  }
-
-  nextWhile(condition) {
-    const lines = [];
-
-    while (condition(this.next())) {
-      lines.push(this.current());
+    if (tags) {
+      commit.tags = tags;
     }
 
-    return lines;
+    if (branches) {
+      commit.branches = branches;
+    }
+
+    commits.push(commit);
   }
 
-  current() {
-    return this.lines[this.idx];
-  }
+  return commits;
+};
 
-  peek() {
-    return this.lines[this.idx + 1];
-  }
-
-  index() {
-    return this.idx;
-  }
+function parseAuthor(author) {
+  return matchGroups(/Author:\s(?<name>.*?)\s<(?<email>.*?)>/, author);
 }

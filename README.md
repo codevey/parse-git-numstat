@@ -39,3 +39,17 @@ npm i parse-git-numstat
     //   ]
     // }
 ```
+
+## Parsing Branches and Tags
+
+If `tags` and `branches` should be parsed the git log should be generate with
+
+```bash
+git log --numstat --decorate > gitlog.txt
+```
+
+or
+
+```bash
+git log --numstat --decorate=full > gitlog.txt
+```
