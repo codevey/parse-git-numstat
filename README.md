@@ -28,7 +28,7 @@ Prints
     tags: [...],        // field available when using --decorate
     author: { name: '...', email: '...' },
     merge: null,
-    date: 2019-06-01T15:49:20.000Z,
+    date: '2019-06-01T15:49:20.000Z',
     message: 'chore: initial commit',
     stat: [
         { added: 16, deleted: 0, filepath: '.editorconfig' },
